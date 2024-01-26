@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View , StatusBar, Dimensions } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -16,21 +16,15 @@ const Tab = createBottomTabNavigator();
 const ScreenHeight = Dimensions.get("screen").height - Dimensions.get("window").height;
 
 function App() {
-  initSetupPlayer();
+  useEffect(() => {
+    initSetupPlayer();
+    NavigationBar.setPositionAsync('absolute');
+    NavigationBar.setBackgroundColorAsync('#00000000');
 
-  /*
-    TODO:
-    - Verificar el doble renderizado de player al usar una propiedad de PlayerContext
-    - Hacer validaciones de undefined para vibrant, dark, url
-    - El player debe cargar indiferentemente de la url
-    - En caso la canción esté cargando, debe mostrar una animación en el botón de play.
-  */
-  NavigationBar.setPositionAsync('absolute')
-  NavigationBar.setBackgroundColorAsync('#00000000');
-
-  StatusBar.setTranslucent(true);
-  StatusBar.setBackgroundColor('transparent');
-  StatusBar.setBarStyle('light-content', true);
+    StatusBar.setTranslucent(true);
+    StatusBar.setBackgroundColor('transparent');
+    StatusBar.setBarStyle('light-content', true);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#262639' }}>
@@ -61,58 +55,47 @@ function AppContent(){
           elevation: 0,
         }
         }}>
+          
         <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-              tabBarButton: (props) => 
-              <TabComponent
-                focusedIcon="home"
-                unfocusedIcon="home-outline"
-                label="home" 
-                {...props} />,
-            }}
-        />
+            name="Home"
+            component={Home}
+            options={createTabOptions('home-outline', 'home', 'home')}/>
         <Tab.Screen
-          name="Search"
-          component={Search}
-          options={{
-              tabBarButton: (props) => 
-              <TabComponent 
-                unfocusedIcon="search-outline"
-                focusedIcon="search-sharp"
-                label="search" {...props} />,
-            }}
-        />
+            name="Search"
+            component={Search}
+            options={createTabOptions('search-outline', 'search-sharp', 'search')}/>
         <Tab.Screen
-          name="Library"
-          component={Library}
-          options={{
-              tabBarButton: (props) => 
-              <TabComponent 
-              unfocusedIcon="podium-outline"
-              focusedIcon="podium"
-              label="library" {...props} />,
-            }}
-        />
+            name="Library"
+            component={Library}
+            options={createTabOptions('podium-outline', 'podium', 'library')}/>
         <Tab.Screen
-          name="Settings"
-          component={Settings}
-          options={{
-              tabBarButton: (props) => 
-              <TabComponent 
-              unfocusedIcon="settings-outline"
-              focusedIcon="settings"
-              label="settings" {...props} />,
-            }}
-        />
+            name="Settings"
+            component={Settings}
+            options={createTabOptions('settings-outline', 'settings', 'settings')}/>
         
       </Tab.Navigator>
       </NavigationContainer>
   )
 }
 
+type TabOptions = {
+  tabBarButton: (props: any) => JSX.Element;
+};
 
+const createTabOptions = (
+  unfocusedIcon: string,
+  focusedIcon: string,
+  label: string
+): TabOptions => ({
+  tabBarButton: (props) => (
+    <TabComponent
+      unfocusedIcon={unfocusedIcon}
+      focusedIcon={focusedIcon}
+      label={label}
+      {...props}
+    />
+  ),
+});
 
 export default App
 
