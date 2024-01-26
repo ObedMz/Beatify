@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BeatifyV2",
-    "slug": "BeatifyV2",
+    "slug": "beatifyv2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,23 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.obedmz.BeatifyV2"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8153e9e0-d251-4389-b757-9e7dfa27a813"
+      }
+    },
+    "owner": "fransmz",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8153e9e0-d251-4389-b757-9e7dfa27a813"
     }
   }
 }
