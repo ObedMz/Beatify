@@ -37,8 +37,7 @@ function App() {
       <PlayerProvider>
         <AppContent/>
       </PlayerProvider>
-    </View>
-  );
+    </View>);
 }
 function AppContent(){
   return (
