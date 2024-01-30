@@ -10,6 +10,7 @@ import MusicPlayer from "./PlayerActiveLayout";
 const PlayerLayout = () => {
   const { music } = usePlayerContext();
   const [ isPlaying , setPlaying] = useState(true);
+  const [ active, setActive] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const handlerPress = () => {
@@ -80,7 +81,9 @@ const PlayerLayout = () => {
         <Pressable>
           <Image source={{ uri: music.thumbnails[0].url }} style={styles.image} />
         </Pressable>
-        <Pressable style={styles.container_touch}>
+        <Pressable style={styles.container_touch} onPress={() => {
+          setActive(true)
+        }}>
           <Text style={styles.title}>{((music.name).length > 35) ? (((music.name).substring(0, 35 - 3)) + '...') : music.name}</Text>
           <Text style={styles.subtitle}>{getArtist(music.artists)}</Text>
         </Pressable>
@@ -103,6 +106,15 @@ const PlayerLayout = () => {
       </View>
 
     </GestureHandlerRootView>
+    <MusicPlayer
+    active={active}
+    loading={loading}
+    isPlaying={isPlaying}
+    music={music}
+    setActive={setActive}
+    setPlaying={setPlaying}
+    setLoading={setLoading}
+    />
     </>
   );
 };

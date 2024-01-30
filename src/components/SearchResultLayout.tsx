@@ -62,8 +62,10 @@ const SearchResultLayout: React.FC = () => {
       const addItemsInterval = setInterval(() => {
           if (itemsAdded < totalItems) {
               const item = data[itemsAdded];
-              setSearchResults((prevSearchResults: SearchResult[]) => prevSearchResults.concat(item));   
-              itemsAdded++;
+              if(item) {
+                setSearchResults((prevSearchResults: SearchResult[]) => prevSearchResults.concat(item));   
+                itemsAdded++;
+              }
           } else {
               setLoading(false)
               clearInterval(addItemsInterval);

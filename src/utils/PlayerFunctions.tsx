@@ -1,7 +1,7 @@
 import { getColors } from 'react-native-image-colors';
 
 
-export const URL_ROUTE = 'https://fc43-179-6-170-150.ngrok-free.app';
+export const URL_ROUTE = 'https://4357-179-6-170-150.ngrok-free.app';
 
 export const getArtist = (artists: Artist[]): string => {
   const MAX_DISPLAY_ARTISTS = 3;

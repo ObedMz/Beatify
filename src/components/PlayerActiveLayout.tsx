@@ -1,23 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated,Dimensions ,Image, ScrollView, View, Text, StyleSheet} from 'react-native';
+import { Animated,Dimensions ,Image, ScrollView, View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSharedValue } from 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Slider } from 'react-native-awesome-slider';
 
-import TrackPlayer, {  useProgress } from 'react-native-track-player';
+import TrackPlayer, { useProgress } from 'react-native-track-player';
 import { Entypo, Feather, MaterialCommunityIcons , Ionicons } from '@expo/vector-icons'; 
 import { getArtist } from '../utils/PlayerFunctions';
-import { usePlayerContext } from '../context/PlayerContext';
-
 
 const ScreenHeight = Dimensions.get("screen").height;
-
-const MusicPlayer = () => {
-    const { music , isPlaying, setPlaying} = usePlayerContext();
-    const [active, setActive] = useState(true);
-    const [MusicPlayerBottom, setMusicPlayerBottom] = useState(0)
+interface MusicPlayerProps {
+  loading: boolean;
+  isPlaying: boolean;
+  active: boolean;
+  music: Song;
+  setActive: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+const MusicPlayer: React.FC<MusicPlayerProps> = ({
+  loading,
+  isPlaying,
+  music,
+  active,
+  setPlaying,
+  setActive,
+  setLoading,
+}) => {
+  /* 
+    TODO:
+     - leer el end event del player para pausar el icono al terminar la canción.
+     - agregar sistema de cola, y botones al player outside.
+     - arreglar el flat-list: undefined search and other values.
+     - revisar eventos fuera del contexto como:
+     - interrupciones de llamadas, botones outside, track-change, track-end
+     - PlaybackActiveTrackChanged, PlaybackQueueEnded,
+     PlaybackProgressUpdated, PlaybackError,
+  **/
     const {position} = useProgress();
     const animMusicPlayerBottom = useRef(new Animated.Value(0)).current;
     const progress = useSharedValue(0);
@@ -27,22 +48,21 @@ const MusicPlayer = () => {
     const max = useSharedValue(0);
     
     useEffect(() => {
-      if(follow_track) progress.value = position;
-    }, [position])
 
-    useEffect(()=>{
-      Animated.timing(animMusicPlayerBottom, {
-        toValue: MusicPlayerBottom,
-        duration: 250, 
-        useNativeDriver: false, 
-      }).start();
-    },[MusicPlayerBottom])
+      if(follow_track) progress.value = position;
+      //Check if there are more tracks here.
+      if(music?.duration != undefined && position >= music?.duration ){
+          console.log('reach end music, change state of playing');
+          setPlaying(false)
+      }
+    }, [position])
 
     useEffect(()=>{
       if(!music)
         return;
 
       max.value = music.duration;
+      //this can be use as a music change event.
     }, [music])
 
 
@@ -75,19 +95,34 @@ const MusicPlayer = () => {
       if(isPlaying){
         TrackPlayer.pause();
       } else {
-        TrackPlayer.play();
+        //Check if there are more tracks here maybe.
+        if(music?.duration != undefined && position >= music?.duration ){
+         //repeat.
+        } else {
+          TrackPlayer.play();
+        }
       }
     }
-
+    
+    useEffect(()=>{
+      Animated.timing(animMusicPlayerBottom, {
+        toValue: ( (active) ? 0 : ScreenHeight),
+        duration: 250, 
+        useNativeDriver: false, 
+      }).start();
+    }, [active]);
     const handlerTest = () => {
-        console.log('test')
+      setActive(false);
      }
 
 return (
   <Animated.View style={[styles.container_root, { top: animMusicPlayerBottom}]}>
   <GestureHandlerRootView style={{width: '100%', height: '100%'}}>
     <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-    <LinearGradient colors={[music.colorsList.vibrant, music.colorsList.dark, music.colorsList.dark]} style={styles.player}>
+    <LinearGradient colors={[
+    music.colorsList?.vibrant || '#3333',
+    music.colorsList?.vibrant || '#3333',
+  ]} style={styles.player}>
 
     <View style={styles.top_header}>
     <Feather name="chevron-down" size={24} color="white" onPress={handlerTest}/>
@@ -116,7 +151,7 @@ return (
         disableMinTrackTintColor: 'gray',
         maximumTrackTintColor: 'gray',
         minimumTrackTintColor: '#fff',
-        bubbleBackgroundColor: 'rgba(255,255,255,0.1)',
+        bubbleBackgroundColor: 'rgba(255,255,255,0.4)',
       }}
       
       onSlidingStart={()=> {
@@ -143,7 +178,11 @@ return (
   <Feather name="shuffle" size={18} color="silver" />
   <View style={styles.main_control}>
     <Feather name="skip-back" size={24} color="white" />
-    <Ionicons style={styles.play_button} name={!isPlaying ? "play" : "pause"} size={50} color="white" onPress={handlerPress}/>
+    {loading ? (
+      <ActivityIndicator size='large' color='#ffff'/>
+    ) : (
+      <Ionicons style={styles.play_button} name={!isPlaying ? "play" : "pause"} size={50} color="white" onPress={handlerPress}/>
+    )}
     <Feather name="skip-forward" size={24} color="white"/>
   </View>
     <Feather name="repeat" size={18} color="silver" />
